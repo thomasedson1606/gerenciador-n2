@@ -48,7 +48,7 @@ const DevelopmentFlowTab: React.FC = () => {
       </div>
 
       <div className="card">
-        <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(4, 1fr)', alignItems: 'end' }}>
+        <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', alignItems: 'end' }}>
           <div className="input-group">
             <label>Status Desenvolvimento</label>
             <CustomSelect
