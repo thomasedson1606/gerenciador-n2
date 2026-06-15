@@ -49,7 +49,7 @@ const CompletedRequestsTab: React.FC = () => {
       </div>
 
       <div className={styles.gridSection}>
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="card" style={{ padding: 0, overflow: 'clip' }}>
           <div className={styles.tableResponsive}>
             <table className={styles.table}>
               <thead>

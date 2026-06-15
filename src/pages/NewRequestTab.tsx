@@ -261,7 +261,7 @@ ${req.imagens}`;
 
       <div className={styles.gridSection}>
         <h2 className="title-2" style={{marginTop: '2rem'}}>Lançamentos</h2>
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="card" style={{ padding: 0, overflow: 'clip' }}>
           <div className={styles.tableResponsive}>
             <table className={styles.table}>
               <thead>

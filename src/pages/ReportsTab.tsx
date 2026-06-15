@@ -112,7 +112,7 @@ const ReportsTab: React.FC = () => {
             </div>
           </div>
           
-          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="card" style={{ padding: 0, overflow: 'clip' }}>
             <div className={styles.tableResponsive}>
               <table className={styles.table} ref={tableRef}>
                 <thead>
