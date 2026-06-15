@@ -10,7 +10,9 @@ const NewRequestTab: React.FC = () => {
   const { requests, addRequest, deleteRequest } = useAppContext();
   
   // Local state for the form
+  const today = format(new Date(), 'dd/MM/yyyy');
   const [formData, setFormData] = useState({
+    data: today,
     situacao: 'ABERTA' as SupportRequest['situacao'],
     titulo: '',
     prioridade: 'MÉDIA' as Prioridade,
@@ -54,7 +56,6 @@ const NewRequestTab: React.FC = () => {
     
     addRequest({
       ...formData,
-      data: format(new Date(), 'dd/MM/yyyy')
     });
     
     // Reset partially (keeping some defaults)
@@ -130,7 +131,7 @@ ${req.imagens}`;
           </div>
           <div className="input-group">
             <label>Data</label>
-            <input type="text" value={format(new Date(), 'dd/MM/yyyy')} disabled className="input" />
+            <input type="text" name="data" value={formData.data} onChange={handleInputChange} className="input" />
           </div>
           <div className="input-group" style={{ gridColumn: 'span 2' }}>
             <label>Título*</label>
