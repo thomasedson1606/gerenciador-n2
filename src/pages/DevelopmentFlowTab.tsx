@@ -36,8 +36,8 @@ const DevelopmentFlowTab: React.FC = () => {
     setHasQueried(true);
   };
 
-  const handleStatusChange = (id: string, newStatus: StatusDesenvolvimento) => {
-    updateRequest(id, { statusDesenvolvimento: newStatus });
+  const handleStatusChange = async (id: string, newStatus: StatusDesenvolvimento) => {
+    await updateRequest(id, { statusDesenvolvimento: newStatus });
   };
 
   return (

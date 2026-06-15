@@ -14,24 +14,24 @@ const N3DevelopmentTab: React.FC = () => {
   const availableRequests = requests.filter(req => req.situacao === 'ABERTA' && !req.numeroDesk);
   const n3Requests = requests.filter(req => req.numeroDesk);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRequestId || !numeroDesk) {
       alert('Preencha os campos obrigatórios.');
       return;
     }
     
-    updateRequest(selectedRequestId, { 
+    await updateRequest(selectedRequestId, { 
       numeroDesk,
-      statusDesenvolvimento: 'EM ANALISE' // Default status when moving to N3
+      statusDesenvolvimento: 'EM ANALISE'
     });
     
     setSelectedRequestId('');
     setNumeroDesk('');
   };
 
-  const handleRemoveFromN3 = (id: string) => {
-    updateRequest(id, { 
+  const handleRemoveFromN3 = async (id: string) => {
+    await updateRequest(id, { 
       numeroDesk: undefined,
       statusDesenvolvimento: undefined 
     });

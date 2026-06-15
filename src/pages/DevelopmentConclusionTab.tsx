@@ -40,14 +40,14 @@ const DevelopmentConclusionTab: React.FC = () => {
     handleEditChange(id, 'versaoCorrecao', masked);
   };
 
-  const handleSaveConclusao = (req: SupportRequest) => {
+  const handleSaveConclusao = async (req: SupportRequest) => {
     const form = editForms[req.id];
     if (!form) return;
 
     if (req.statusDesenvolvimento === 'CORRIGIDA') {
       const isUpdated = form.sistemaAtualizado === 'SIM';
       
-      updateRequest(req.id, {
+      await updateRequest(req.id, {
         versaoCorrecao: form.versaoCorrecao,
         changeLog: form.changeLog,
         sistemaAtualizado: isUpdated,
@@ -56,7 +56,7 @@ const DevelopmentConclusionTab: React.FC = () => {
       });
       alert('Conclusão salva com sucesso!');
     } else if (req.statusDesenvolvimento === 'REJEITADA') {
-      updateRequest(req.id, {
+      await updateRequest(req.id, {
         motivoRejeicao: form.motivoRejeicao,
         situacao: 'FINALIZADA',
         statusDesenvolvimento: 'REJEITADA'

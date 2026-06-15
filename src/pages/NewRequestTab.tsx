@@ -53,7 +53,7 @@ const NewRequestTab: React.FC = () => {
     setFormData(prev => ({ ...prev, [e.target.name]: masked }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.titulo || !formData.licencaEmpresa || !formData.versaoTestada) {
       alert('Por favor preencha os campos obrigatórios (Título, Empresa, Versão)');
@@ -61,9 +61,9 @@ const NewRequestTab: React.FC = () => {
     }
     
     if (editingId) {
-      updateRequest(editingId, formData);
+      await updateRequest(editingId, formData);
     } else {
-      addRequest(formData);
+      await addRequest(formData);
     }
     
     resetForm();
@@ -296,7 +296,7 @@ ${req.imagens}`;
                           <button onClick={() => handleEdit(req)} className={styles.iconBtn} title="Editar">
                             <Edit2 size={16} />
                           </button>
-                          <button onClick={() => deleteRequest(req.id)} className={`${styles.iconBtn} ${styles.danger}`} title="Excluir">
+                          <button onClick={async () => { await deleteRequest(req.id); }} className={`${styles.iconBtn} ${styles.danger}`} title="Excluir">
                             <Trash2 size={16} />
                           </button>
                           <button onClick={() => handleExportTXT(req)} className={styles.iconBtn} title="Exportar TXT">

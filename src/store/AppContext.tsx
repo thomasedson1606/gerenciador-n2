@@ -1,14 +1,27 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { db } from '../firebase/config';
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
+  orderBy,
+} from 'firebase/firestore';
 import type { SupportRequest } from '../types';
 
 interface AppContextData {
   requests: SupportRequest[];
-  addRequest: (request: Omit<SupportRequest, 'id' | 'codigo'>) => void;
-  updateRequest: (id: string, request: Partial<SupportRequest>) => void;
-  deleteRequest: (id: string) => void;
+  addRequest: (request: Omit<SupportRequest, 'id' | 'codigo'>) => Promise<void>;
+  updateRequest: (id: string, request: Partial<SupportRequest>) => Promise<void>;
+  deleteRequest: (id: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextData>({} as AppContextData);
+
+const COLLECTION = 'requests';
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [requests, setRequests] = useState<SupportRequest[]>(() => {
@@ -19,26 +32,39 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return [];
   });
 
+  // Sync from Firestore in real-time
   useEffect(() => {
-    localStorage.setItem('@GerenciadorN2:requests', JSON.stringify(requests));
-  }, [requests]);
+    const q = query(collection(db, COLLECTION), orderBy('codigo'));
+    const unsub = onSnapshot(q, (snapshot) => {
+      const list: SupportRequest[] = [];
+      snapshot.forEach((d) => {
+        list.push({ id: d.id, ...d.data() } as SupportRequest);
+      });
+      setRequests(list);
+      localStorage.setItem('@GerenciadorN2:requests', JSON.stringify(list));
+    });
+    return unsub;
+  }, []);
 
-  const addRequest = (newRequest: Omit<SupportRequest, 'id' | 'codigo'>) => {
-    const nextCodigo = (requests.length > 0 ? Math.max(...requests.map(r => parseInt(r.codigo || '0'))) + 1 : 1000).toString();
-    const request: SupportRequest = {
-      ...newRequest,
-      id: crypto.randomUUID(),
-      codigo: nextCodigo,
-    };
-    setRequests([...requests, request]);
+  const getNextCodigo = async () => {
+    const maxCodigo = requests.reduce(
+      (max, r) => Math.max(max, parseInt(r.codigo || '0')),
+      1000
+    );
+    return String(maxCodigo + 1);
   };
 
-  const updateRequest = (id: string, updatedFields: Partial<SupportRequest>) => {
-    setRequests(requests.map(req => (req.id === id ? { ...req, ...updatedFields } : req)));
+  const addRequest = async (newRequest: Omit<SupportRequest, 'id' | 'codigo'>) => {
+    const codigo = await getNextCodigo();
+    await addDoc(collection(db, COLLECTION), { ...newRequest, codigo });
   };
 
-  const deleteRequest = (id: string) => {
-    setRequests(requests.filter(req => req.id !== id));
+  const updateRequest = async (id: string, updatedFields: Partial<SupportRequest>) => {
+    await updateDoc(doc(db, COLLECTION, id), updatedFields);
+  };
+
+  const deleteRequest = async (id: string) => {
+    await deleteDoc(doc(db, COLLECTION, id));
   };
 
   return (
