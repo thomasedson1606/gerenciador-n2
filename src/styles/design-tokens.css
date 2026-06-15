@@ -1,0 +1,63 @@
+:root {
+  /* Linear / Vercel inspired aesthetic */
+  --bg-base: #000000;
+  --bg-surface: #0a0a0a;
+  --bg-surface-glass: rgba(10, 10, 10, 0.7);
+  --bg-surface-glass-border: rgba(255, 255, 255, 0.08);
+  --bg-hover: #171717;
+  
+  --primary-accent: #e2e8f0;
+  --primary-accent-hover: #ffffff;
+  --primary-accent-bg: #1a1a1a;
+  
+  --text-main: #ededed;
+  --text-muted: #a1a1aa;
+  
+  /* Status Colors (Pastel / Soft but vibrant) */
+  --status-critical: #ff453a;
+  --status-high: #ff9f0a;
+  --status-medium: #ffd60a;
+  --status-low: #32d74b;
+  --status-minimal: #0a84ff;
+
+  /* Form Elements */
+  --input-bg: #000000;
+  --input-border: #27272a;
+  --input-focus: #52525b;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  
+  /* Utilities */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.05);
+  
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] {
+  --bg-base: #fafafa;
+  --bg-surface: #ffffff;
+  --bg-surface-glass: rgba(255, 255, 255, 0.8);
+  --bg-surface-glass-border: rgba(0, 0, 0, 0.05);
+  --bg-hover: #f4f4f5;
+  
+  --primary-accent: #18181b;
+  --primary-accent-hover: #000000;
+  --primary-accent-bg: #f4f4f5;
+  
+  --text-main: #09090b;
+  --text-muted: #71717a;
+  
+  --input-bg: #ffffff;
+  --input-border: #e4e4e7;
+  --input-focus: #a1a1aa;
+}

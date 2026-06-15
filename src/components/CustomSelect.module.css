@@ -1,0 +1,115 @@
+.selectContainer {
+  position: relative;
+  width: 100%;
+}
+
+.containerOpen {
+  z-index: 100;
+}
+
+.selectTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.selectTrigger:hover {
+  border-color: #52525b;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 2px 8px rgba(255,255,255,0.02);
+}
+
+.selectTrigger:focus, .selectTrigger.open {
+  outline: none;
+  border-color: var(--text-main);
+  box-shadow: 0 0 0 1px var(--text-main), 0 0 0 4px rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-surface);
+}
+
+.placeholder {
+  color: #52525b;
+}
+
+.value {
+  color: var(--text-main);
+}
+
+.icon {
+  color: #a1a1aa;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.iconOpen {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  max-height: 250px;
+  overflow-y: auto;
+  animation: slideDownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownFade {
+  0% { opacity: 0; transform: translateY(-8px) scaleY(0.95); transform-origin: top; }
+  100% { opacity: 1; transform: translateY(0) scaleY(1); transform-origin: top; }
+}
+
+.option {
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.option:hover {
+  background-color: var(--bg-hover);
+}
+
+.option.selected {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.noOptions {
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Custom scrollbar for dropdown */
+.dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dropdown::-webkit-scrollbar-thumb {
+  background: var(--input-border);
+  border-radius: 3px;
+}
+.dropdown::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
