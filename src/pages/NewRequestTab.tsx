@@ -3,33 +3,39 @@ import { useAppContext } from '../store/AppContext';
 import type { SupportRequest, Prioridade, Sistema, Motivo } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
 import styles from './NewRequestTab.module.css';
-import { Save, Download, Edit2, Trash2 } from 'lucide-react';
+import { Save, Download, Edit2, Trash2, X } from 'lucide-react';
 import { format } from 'date-fns';
 
+const INITIAL_FORM = {
+  data: format(new Date(), 'dd/MM/yyyy'),
+  situacao: 'ABERTA' as SupportRequest['situacao'],
+  titulo: '',
+  prioridade: 'MÉDIA' as Prioridade,
+  sistema: 'STOR' as Sistema,
+  motivo: 'Bugs' as Motivo,
+  licencaEmpresa: '',
+  numeroOSDesk: '',
+  solicitante: '',
+  versaoTestada: '',
+  versaoCliente: '',
+  breveResumo: '',
+  processo: '',
+  observacaoComplementar: '',
+  bancoDados: '',
+  imagens: '',
+  numeroDesk: ''
+};
+
 const NewRequestTab: React.FC = () => {
-  const { requests, addRequest, deleteRequest } = useAppContext();
+  const { requests, addRequest, updateRequest, deleteRequest } = useAppContext();
   
-  // Local state for the form
-  const today = format(new Date(), 'dd/MM/yyyy');
-  const [formData, setFormData] = useState({
-    data: today,
-    situacao: 'ABERTA' as SupportRequest['situacao'],
-    titulo: '',
-    prioridade: 'MÉDIA' as Prioridade,
-    sistema: 'STOR' as Sistema,
-    motivo: 'Bugs' as Motivo,
-    licencaEmpresa: '',
-    numeroOSDesk: '',
-    solicitante: 'SUPORTE',
-    versaoTestada: '',
-    versaoCliente: '',
-    breveResumo: '',
-    processo: '',
-    observacaoComplementar: '',
-    bancoDados: '',
-    imagens: '',
-    numeroDesk: ''
-  });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState(INITIAL_FORM);
+
+  const resetForm = () => {
+    setFormData({ ...INITIAL_FORM, data: format(new Date(), 'dd/MM/yyyy') });
+    setEditingId(null);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -54,22 +60,36 @@ const NewRequestTab: React.FC = () => {
       return;
     }
     
-    addRequest({
-      ...formData,
-    });
+    if (editingId) {
+      updateRequest(editingId, formData);
+    } else {
+      addRequest(formData);
+    }
     
-    // Reset partially (keeping some defaults)
+    resetForm();
+  };
+
+  const handleEdit = (req: SupportRequest) => {
     setFormData({
-      ...formData,
-      titulo: '',
-      licencaEmpresa: '',
-      numeroOSDesk: '',
-      breveResumo: '',
-      processo: '',
-      observacaoComplementar: '',
-      bancoDados: '',
-      imagens: ''
+      data: req.data,
+      situacao: req.situacao,
+      titulo: req.titulo,
+      prioridade: req.prioridade,
+      sistema: req.sistema,
+      motivo: req.motivo,
+      licencaEmpresa: req.licencaEmpresa,
+      numeroOSDesk: req.numeroOSDesk,
+      solicitante: req.solicitante,
+      versaoTestada: req.versaoTestada,
+      versaoCliente: req.versaoCliente,
+      breveResumo: req.breveResumo,
+      processo: req.processo,
+      observacaoComplementar: req.observacaoComplementar,
+      bancoDados: req.bancoDados,
+      imagens: req.imagens,
+      numeroDesk: req.numeroDesk
     });
+    setEditingId(req.id);
   };
 
   const handleExportTXT = (req: SupportRequest) => {
@@ -83,7 +103,7 @@ _____________________________________________________________________
 
 Cliente: ${req.licencaEmpresa}
 Versão Cliente: ${req.versaoCliente}
-Versão Testasda: ${req.versaoTestada}
+Versão Testada: ${req.versaoTestada}
 
 ${req.breveResumo}
 Motivo: ${req.motivo}
@@ -189,7 +209,7 @@ ${req.imagens}`;
           </div>
           <div className="input-group">
             <label>Solicitante</label>
-            <input type="text" name="solicitante" value={formData.solicitante} onChange={handleInputChange} className="input" />
+            <input type="text" name="solicitante" value={formData.solicitante} onChange={handleInputChange} placeholder="Ex: Suporte" className="input" />
           </div>
           <div className="input-group">
             <label>Versão Testada*</label>
@@ -228,8 +248,13 @@ ${req.imagens}`;
 
           <div className={styles.formActions} style={{ gridColumn: 'span 4' }}>
             <button type="submit" className="btn btn-primary">
-              <Save size={18} /> Salvar Solicitação
+              <Save size={18} /> {editingId ? 'Atualizar Solicitação' : 'Salvar Solicitação'}
             </button>
+            {editingId && (
+              <button type="button" onClick={resetForm} className="btn btn-secondary">
+                <X size={18} /> Cancelar
+              </button>
+            )}
           </div>
         </form>
       </div>
@@ -268,7 +293,7 @@ ${req.imagens}`;
                       <td>{req.sistema}</td>
                       <td>
                         <div className="flex gap-2">
-                          <button className={styles.iconBtn} title="Editar (Em breve)">
+                          <button onClick={() => handleEdit(req)} className={styles.iconBtn} title="Editar">
                             <Edit2 size={16} />
                           </button>
                           <button onClick={() => deleteRequest(req.id)} className={`${styles.iconBtn} ${styles.danger}`} title="Excluir">
