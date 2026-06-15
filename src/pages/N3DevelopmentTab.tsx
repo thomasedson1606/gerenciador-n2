@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../store/AppContext';
 import { CustomSelect } from '../components/CustomSelect';
-import type { SupportRequest } from '../types';
 import styles from './NewRequestTab.module.css'; // Reusing some base styles
 import { Save, Trash2 } from 'lucide-react';
 

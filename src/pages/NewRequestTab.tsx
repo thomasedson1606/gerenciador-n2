@@ -25,7 +25,8 @@ const NewRequestTab: React.FC = () => {
     processo: '',
     observacaoComplementar: '',
     bancoDados: '',
-    imagens: ''
+    imagens: '',
+    numeroDesk: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -119,7 +120,7 @@ ${req.imagens}`;
             <label>Situação</label>
             <CustomSelect
               value={formData.situacao}
-              onChange={(val) => setFormData({...formData, situacao: val})}
+              onChange={(val) => setFormData({...formData, situacao: val as SupportRequest['situacao']})}
               options={[
                 { value: 'ABERTA', label: 'ABERTA' },
                 { value: 'CORRIGIDA', label: 'CORRIGIDA' },
