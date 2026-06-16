@@ -60,7 +60,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const updateRequest = async (id: string, updatedFields: Partial<SupportRequest>) => {
-    await updateDoc(doc(db, COLLECTION, id), updatedFields);
+    const cleanFields = Object.fromEntries(
+      Object.entries(updatedFields).filter(([, v]) => v !== undefined)
+    );
+    await updateDoc(doc(db, COLLECTION, id), cleanFields);
   };
 
   const deleteRequest = async (id: string) => {

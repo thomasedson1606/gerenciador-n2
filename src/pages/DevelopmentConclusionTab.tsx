@@ -41,27 +41,28 @@ const DevelopmentConclusionTab: React.FC = () => {
   };
 
   const handleSaveConclusao = async (req: SupportRequest) => {
-    const form = editForms[req.id];
-    if (!form) return;
-
-    if (req.statusDesenvolvimento === 'CORRIGIDA') {
-      const isUpdated = form.sistemaAtualizado === 'SIM';
-      
-      await updateRequest(req.id, {
-        versaoCorrecao: form.versaoCorrecao,
-        changeLog: form.changeLog,
-        sistemaAtualizado: isUpdated,
-        situacao: isUpdated ? 'FINALIZADA' : req.situacao,
-        statusDesenvolvimento: 'CORRIGIDA'
-      });
-      alert('Conclusão salva com sucesso!');
-    } else if (req.statusDesenvolvimento === 'REJEITADA') {
-      await updateRequest(req.id, {
-        motivoRejeicao: form.motivoRejeicao,
-        situacao: 'FINALIZADA',
-        statusDesenvolvimento: 'REJEITADA'
-      });
-      alert('Rejeição salva com sucesso!');
+    try {
+      const form = editForms[req.id] || {};
+  
+      if (req.statusDesenvolvimento === 'CORRIGIDA') {
+        await updateRequest(req.id, {
+          versaoCorrecao: form.versaoCorrecao,
+          changeLog: form.changeLog,
+          sistemaAtualizado: form.sistemaAtualizado === 'SIM',
+          situacao: form.sistemaAtualizado === 'SIM' ? 'FINALIZADA' : req.situacao,
+          statusDesenvolvimento: 'CORRIGIDA'
+        });
+        alert('Conclusão salva com sucesso!');
+      } else if (req.statusDesenvolvimento === 'REJEITADA') {
+        await updateRequest(req.id, {
+          motivoRejeicao: form.motivoRejeicao,
+          situacao: 'FINALIZADA',
+          statusDesenvolvimento: 'REJEITADA'
+        });
+        alert('Rejeição salva com sucesso!');
+      }
+    } catch (err) {
+      alert('Erro ao salvar: ' + (err instanceof Error ? err.message : 'desconhecido'));
     }
   };
 
@@ -91,7 +92,7 @@ const DevelopmentConclusionTab: React.FC = () => {
               value={filterStatus}
               onChange={setFilterStatus}
               options={[
-                { value: '', label: 'TODOS' },
+                { value: 'TODAS', label: 'TODOS' },
                 { value: 'CORRIGIDA', label: 'CORRIGIDA' },
                 { value: 'REJEITADA', label: 'REJEITADA' }
               ]}

@@ -39,7 +39,22 @@ const NewRequestTab: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    if (name === 'data') {
+      handleDateMask(e as React.ChangeEvent<HTMLInputElement>);
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateMask = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length > 8) val = val.slice(0, 8);
+    let masked = '';
+    for (let i = 0; i < val.length; i++) {
+      if (i === 2 || i === 4) masked += '/';
+      masked += val[i];
+    }
+    setFormData(prev => ({ ...prev, data: masked }));
   };
 
   const handleVersionMask = (e: React.ChangeEvent<HTMLInputElement>) => {
