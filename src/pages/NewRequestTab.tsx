@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../store/AppContext';
 import type { SupportRequest, Prioridade, Sistema, Motivo } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
 import styles from './NewRequestTab.module.css';
-import { Save, Download, Edit2, Trash2, X } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import { format } from 'date-fns';
 
 const INITIAL_FORM = {
@@ -27,7 +28,9 @@ const INITIAL_FORM = {
 };
 
 const NewRequestTab: React.FC = () => {
-  const { requests, addRequest, updateRequest, deleteRequest } = useAppContext();
+  const { addRequest, updateRequest } = useAppContext();
+  const navigate = useNavigate();
+  const location = useLocation();
   
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
@@ -35,7 +38,35 @@ const NewRequestTab: React.FC = () => {
   const resetForm = () => {
     setFormData({ ...INITIAL_FORM, data: format(new Date(), 'dd/MM/yyyy') });
     setEditingId(null);
+    navigate('/', { replace: true, state: {} });
   };
+
+  useEffect(() => {
+    const state = location.state as { editingRequest?: SupportRequest } | null;
+    if (state?.editingRequest) {
+      const req = state.editingRequest;
+      setFormData({
+        data: req.data,
+        situacao: req.situacao,
+        titulo: req.titulo,
+        prioridade: req.prioridade,
+        sistema: req.sistema,
+        motivo: req.motivo,
+        licencaEmpresa: req.licencaEmpresa,
+        numeroOSDesk: req.numeroOSDesk,
+        solicitante: req.solicitante,
+        versaoTestada: req.versaoTestada,
+        versaoCliente: req.versaoCliente,
+        breveResumo: req.breveResumo,
+        processo: req.processo,
+        observacaoComplementar: req.observacaoComplementar,
+        bancoDados: req.bancoDados,
+        imagens: req.imagens,
+        numeroDesk: req.numeroDesk
+      });
+      setEditingId(req.id);
+    }
+  }, [location.state]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -82,64 +113,6 @@ const NewRequestTab: React.FC = () => {
     }
     
     resetForm();
-  };
-
-  const handleEdit = (req: SupportRequest) => {
-    setFormData({
-      data: req.data,
-      situacao: req.situacao,
-      titulo: req.titulo,
-      prioridade: req.prioridade,
-      sistema: req.sistema,
-      motivo: req.motivo,
-      licencaEmpresa: req.licencaEmpresa,
-      numeroOSDesk: req.numeroOSDesk,
-      solicitante: req.solicitante,
-      versaoTestada: req.versaoTestada,
-      versaoCliente: req.versaoCliente,
-      breveResumo: req.breveResumo,
-      processo: req.processo,
-      observacaoComplementar: req.observacaoComplementar,
-      bancoDados: req.bancoDados,
-      imagens: req.imagens,
-      numeroDesk: req.numeroDesk
-    });
-    setEditingId(req.id);
-  };
-
-  const handleExportTXT = (req: SupportRequest) => {
-    const content = `Título: ${req.titulo}
-Prioridade: ${req.prioridade}
-Sistema: ${req.sistema}
-Motivo: ${req.motivo}
-
-_____________________________________________________________________
-
-
-Cliente: ${req.licencaEmpresa}
-Versão Cliente: ${req.versaoCliente}
-Versão Testada: ${req.versaoTestada}
-
-${req.breveResumo}
-Motivo: ${req.motivo}
-
-Processo:
-${req.processo}
-
-Observação Complementar: ${req.observacaoComplementar}
-
-Banco de dados
-${req.bancoDados}
-
-Imagens
-${req.imagens}`;
-
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `OS_${req.codigo}_${req.licencaEmpresa}.txt`;
-    link.click();
-    URL.revokeObjectURL(link.href);
   };
 
   return (
@@ -272,62 +245,6 @@ ${req.imagens}`;
             )}
           </div>
         </form>
-      </div>
-
-      <div className={styles.gridSection}>
-        <h2 className="title-2" style={{marginTop: '2rem'}}>Lançamentos</h2>
-        <div className="card" style={{ padding: 0, overflow: 'clip' }}>
-          <div className={styles.tableResponsive}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Cód.</th>
-                  <th>Data</th>
-                  <th>Situação</th>
-                  <th>Título</th>
-                  <th>Empresa</th>
-                  <th>Sistema</th>
-                  <th>O.S Desk</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requests.length === 0 ? (
-                  <tr><td colSpan={8} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhum registro encontrado.</td></tr>
-                ) : (
-                  requests.map(req => (
-                    <tr key={req.id}>
-                      <td><strong>{req.codigo}</strong></td>
-                      <td>{req.data}</td>
-                      <td>
-                        <span className={`${styles.badge} ${styles['badge-' + req.situacao.toLowerCase()]}`}>
-                          {req.situacao}
-                        </span>
-                      </td>
-                      <td>{req.titulo}</td>
-                      <td>{req.licencaEmpresa}</td>
-                      <td>{req.sistema}</td>
-                      <td>{req.numeroOSDesk || '-'}</td>
-                      <td>
-                        <div className="flex gap-2">
-                          <button onClick={() => handleEdit(req)} className={styles.iconBtn} title="Editar">
-                            <Edit2 size={16} />
-                          </button>
-                          <button onClick={async () => { await deleteRequest(req.id); }} className={`${styles.iconBtn} ${styles.danger}`} title="Excluir">
-                            <Trash2 size={16} />
-                          </button>
-                          <button onClick={() => handleExportTXT(req)} className={styles.iconBtn} title="Exportar TXT">
-                            <Download size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </div>
   );

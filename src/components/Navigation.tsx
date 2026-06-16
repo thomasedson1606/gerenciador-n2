@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
   FilePlus, 
+  List,
   Code2, 
   Activity, 
   CheckCircle, 
@@ -14,6 +15,7 @@ import styles from './Navigation.module.css';
 
 const navItems = [
   { path: '/', label: 'Nova Solicitação', icon: FilePlus },
+  { path: '/solicitacoes', label: 'Solicitações', icon: List },
   { path: '/n3', label: 'N3/Desenvolvimento', icon: Code2 },
   { path: '/fluxo', label: 'Fluxo Desenvolvimento', icon: Activity },
   { path: '/conclusao', label: 'Conclusão DEV', icon: CheckCircle },

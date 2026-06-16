@@ -5,6 +5,7 @@ import styles from './App.module.css';
 
 // Lazy loading pages for better performance
 const NewRequestTab = React.lazy(() => import('./pages/NewRequestTab'));
+const SolicitacoesTab = React.lazy(() => import('./pages/SolicitacoesTab'));
 const N3DevelopmentTab = React.lazy(() => import('./pages/N3DevelopmentTab'));
 const DevelopmentFlowTab = React.lazy(() => import('./pages/DevelopmentFlowTab'));
 const DevelopmentConclusionTab = React.lazy(() => import('./pages/DevelopmentConclusionTab'));
@@ -20,6 +21,7 @@ const App: React.FC = () => {
         <React.Suspense fallback={<div className={styles.loader}>Loading...</div>}>
           <Routes>
             <Route path="/" element={<NewRequestTab />} />
+            <Route path="/solicitacoes" element={<SolicitacoesTab />} />
             <Route path="/n3" element={<N3DevelopmentTab />} />
             <Route path="/fluxo" element={<DevelopmentFlowTab />} />
             <Route path="/conclusao" element={<DevelopmentConclusionTab />} />
