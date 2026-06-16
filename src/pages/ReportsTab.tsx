@@ -32,9 +32,32 @@ const ReportsTab: React.FC = () => {
     setHasQueried(true);
   };
 
+  const captureTable = async () => {
+    if (!tableRef.current) return null;
+    return html2canvas(tableRef.current, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      onclone: (doc) => {
+        const table = doc.querySelector('table');
+        if (!table) return;
+        table.style.color = '#000000';
+        table.style.backgroundColor = '#ffffff';
+        table.querySelectorAll('th, td').forEach(cell => {
+          (cell as HTMLElement).style.color = '#000000';
+          (cell as HTMLElement).style.backgroundColor = '#ffffff';
+          (cell as HTMLElement).style.borderBottom = '1px solid #cccccc';
+        });
+        table.querySelectorAll('th').forEach(th => {
+          (th as HTMLElement).style.color = '#000000';
+          (th as HTMLElement).style.fontWeight = '600';
+        });
+      }
+    });
+  };
+
   const handleExportPDF = async () => {
-    if (!tableRef.current) return;
-    const canvas = await html2canvas(tableRef.current);
+    const canvas = await captureTable();
+    if (!canvas) return;
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -43,10 +66,20 @@ const ReportsTab: React.FC = () => {
     pdf.save('relatorio-n2.pdf');
   };
 
+  const handleExportImage = async () => {
+    const canvas = await captureTable();
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = 'relatorio-n2.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+
   const handleExportExcel = (type: 'xlsx' | 'xls' | 'csv') => {
     const ws = XLSX.utils.json_to_sheet(filteredRequests.map(req => ({
       'Licença - Empresa': req.licencaEmpresa,
       'Solicitante': req.solicitante,
+      'Sistema': req.sistema,
       'Número DESK': req.numeroDesk || '-',
       'Número da O.S Desk': req.numeroOSDesk || '-',
       'Versão de Correção': req.versaoCorrecao || '-',
@@ -55,15 +88,6 @@ const ReportsTab: React.FC = () => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Relatório');
     XLSX.writeFile(wb, `relatorio-n2.${type}`);
-  };
-
-  const handleExportImage = async () => {
-    if (!tableRef.current) return;
-    const canvas = await html2canvas(tableRef.current);
-    const link = document.createElement('a');
-    link.download = 'relatorio-n2.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
   };
 
   return (
@@ -135,6 +159,7 @@ const ReportsTab: React.FC = () => {
                   <tr>
                     <th>Licença - Empresa</th>
                     <th>Solicitante (Suporte)</th>
+                    <th>Sistema</th>
                     <th>Número DESK</th>
                     <th>O.S Desk</th>
                     <th>Versão de Correção</th>
@@ -143,12 +168,13 @@ const ReportsTab: React.FC = () => {
                 </thead>
                 <tbody>
                   {filteredRequests.length === 0 ? (
-                    <tr><td colSpan={6} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhum dado encontrado para os filtros selecionados.</td></tr>
+                    <tr><td colSpan={7} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhum dado encontrado para os filtros selecionados.</td></tr>
                   ) : (
                     filteredRequests.map(req => (
                       <tr key={req.id}>
                         <td>{req.licencaEmpresa}</td>
                         <td>{req.solicitante}</td>
+                        <td>{req.sistema}</td>
                         <td>{req.numeroDesk || '-'}</td>
                         <td>{req.numeroOSDesk || '-'}</td>
                         <td>{req.versaoCorrecao || '-'}</td>
