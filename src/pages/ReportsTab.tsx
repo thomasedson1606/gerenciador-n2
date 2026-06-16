@@ -13,6 +13,7 @@ const ReportsTab: React.FC = () => {
   const [filterSistema, setFilterSistema] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [filterVersao, setFilterVersao] = useState<string>('');
+  const [filterAtualizado, setFilterAtualizado] = useState<string>('');
   const [hasQueried, setHasQueried] = useState(false);
   
   const tableRef = useRef<HTMLTableElement>(null);
@@ -22,6 +23,8 @@ const ReportsTab: React.FC = () => {
     if (filterSistema && req.sistema !== filterSistema) return false;
     if (filterStatus && req.statusDesenvolvimento !== filterStatus && req.situacao !== filterStatus) return false;
     if (filterVersao && req.versaoCorrecao !== filterVersao) return false;
+    if (filterAtualizado === 'SIM' && !req.sistemaAtualizado) return false;
+    if (filterAtualizado === 'NAO' && req.sistemaAtualizado) return false;
     return true;
   });
 
@@ -46,7 +49,8 @@ const ReportsTab: React.FC = () => {
       'Solicitante': req.solicitante,
       'Número DESK': req.numeroDesk || '-',
       'Número da O.S Desk': req.numeroOSDesk || '-',
-      'Versão de Correção': req.versaoCorrecao || '-'
+      'Versão de Correção': req.versaoCorrecao || '-',
+      'Atualizado': req.sistemaAtualizado ? 'SIM' : 'NÃO'
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Relatório');
@@ -70,7 +74,7 @@ const ReportsTab: React.FC = () => {
       </div>
 
       <div className="card">
-        <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(4, 1fr)', alignItems: 'end' }}>
+        <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(5, 1fr)', alignItems: 'end' }}>
           <div className="input-group">
             <label>Sistema</label>
             <CustomSelect
@@ -90,6 +94,18 @@ const ReportsTab: React.FC = () => {
           <div className="input-group">
             <label>Versão Corrigida</label>
             <input type="text" value={filterVersao} onChange={e => setFilterVersao(e.target.value)} className="input" placeholder="Ex: 04.12.00.00" />
+          </div>
+          <div className="input-group">
+            <label>Atualizado</label>
+            <CustomSelect
+              value={filterAtualizado}
+              onChange={setFilterAtualizado}
+              options={[
+                { value: '', label: 'TODOS' },
+                { value: 'SIM', label: 'SIM' },
+                { value: 'NAO', label: 'NÃO' }
+              ]}
+            />
           </div>
           <div className="input-group">
             <button onClick={handleConsultar} className="btn btn-primary">
@@ -122,11 +138,12 @@ const ReportsTab: React.FC = () => {
                     <th>Número DESK</th>
                     <th>O.S Desk</th>
                     <th>Versão de Correção</th>
+                    <th>Atualizado</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredRequests.length === 0 ? (
-                    <tr><td colSpan={5} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhum dado encontrado para os filtros selecionados.</td></tr>
+                    <tr><td colSpan={6} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhum dado encontrado para os filtros selecionados.</td></tr>
                   ) : (
                     filteredRequests.map(req => (
                       <tr key={req.id}>
@@ -135,6 +152,7 @@ const ReportsTab: React.FC = () => {
                         <td>{req.numeroDesk || '-'}</td>
                         <td>{req.numeroOSDesk || '-'}</td>
                         <td>{req.versaoCorrecao || '-'}</td>
+                        <td>{req.sistemaAtualizado ? 'SIM' : 'NÃO'}</td>
                       </tr>
                     ))
                   )}

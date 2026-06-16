@@ -287,12 +287,13 @@ ${req.imagens}`;
                   <th>Título</th>
                   <th>Empresa</th>
                   <th>Sistema</th>
+                  <th>O.S Desk</th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {requests.length === 0 ? (
-                  <tr><td colSpan={7} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhum registro encontrado.</td></tr>
+                  <tr><td colSpan={8} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhum registro encontrado.</td></tr>
                 ) : (
                   requests.map(req => (
                     <tr key={req.id}>
@@ -306,6 +307,7 @@ ${req.imagens}`;
                       <td>{req.titulo}</td>
                       <td>{req.licencaEmpresa}</td>
                       <td>{req.sistema}</td>
+                      <td>{req.numeroOSDesk || '-'}</td>
                       <td>
                         <div className="flex gap-2">
                           <button onClick={() => handleEdit(req)} className={styles.iconBtn} title="Editar">
