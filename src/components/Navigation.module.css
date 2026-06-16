@@ -102,3 +102,27 @@
   opacity: 1;
   transform: scale(1.1);
 }
+
+.spacer {
+  flex: 1;
+}
+
+.portalLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  border-top: 1px solid var(--input-border);
+  margin-top: 1rem;
+}
+
+.portalLink:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-main);
+}

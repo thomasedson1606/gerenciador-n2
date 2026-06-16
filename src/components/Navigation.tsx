@@ -7,7 +7,8 @@ import {
   CheckCircle, 
   Archive, 
   PieChart, 
-  LayoutDashboard 
+  LayoutDashboard,
+  ExternalLink
 } from 'lucide-react';
 import styles from './Navigation.module.css';
 
@@ -49,6 +50,16 @@ export const Navigation: React.FC = () => {
           </li>
         ))}
       </ul>
+      <div className={styles.spacer} />
+      <a
+        href="https://thom-eight.vercel.app/index.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.portalLink}
+      >
+        <ExternalLink size={20} className={styles.icon} />
+        <span>Voltar ao Portal</span>
+      </a>
     </nav>
   );
 };
