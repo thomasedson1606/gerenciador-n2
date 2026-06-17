@@ -4,7 +4,7 @@ import { useAppContext } from '../store/AppContext';
 import type { SupportRequest, Prioridade, Sistema, Motivo } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
 import styles from './NewRequestTab.module.css';
-import { Save, X, FolderOpen } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import { format } from 'date-fns';
 
 const INITIAL_FORM = {
@@ -247,19 +247,21 @@ const NewRequestTab: React.FC = () => {
                     setFormData(prev => ({ ...prev, bancoDados: text }));
                   }
                 }}
-                placeholder="\\192.168.15.101\NasFtp\..."
+                placeholder="Nenhum arquivo ou caminho mapeado"
                 className="input"
-                style={{ flex: 1 }}
+                style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
               />
-              <button type="button" className="btn btn-secondary" style={{ padding: '0.5rem' }} title="Selecionar arquivo .rar" onClick={() => bancoInputRef.current?.click()}>
-                <FolderOpen size={18} />
+              <button type="button" className="btn btn-secondary" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }} title="Selecionar arquivo .rar" onClick={() => bancoInputRef.current?.click()}>
+                Importar .RAR
               </button>
             </div>
             <input ref={bancoInputRef} type="file" accept=".rar" style={{ display: 'none' }} onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) setFormData(prev => ({ ...prev, bancoDados: file.name }));
+              if (file) {
+                const path = `\\\\192.168.15.101\\NasFtp\\CLIENTES\\STOR\\MAPA_LOCAL\\${file.name}`;
+                setFormData(prev => ({ ...prev, bancoDados: path }));
+              }
             }} />
-            <small style={{ color: '#71717a', fontSize: '0.75rem' }}>Copie o caminho do arquivo no Explorer (Shift+Clique Dir. {'>'} Copiar como caminho) e cole aqui</small>
           </div>
           <div className="input-group" style={{ gridColumn: 'span 2' }}>
             <label>Imagens (Pasta)</label>
@@ -276,22 +278,21 @@ const NewRequestTab: React.FC = () => {
                     setFormData(prev => ({ ...prev, imagens: text }));
                   }
                 }}
-                placeholder="\\192.168.15.101\NasFtp\..."
+                placeholder="Nenhum diretório ou caminho mapeado"
                 className="input"
-                style={{ flex: 1 }}
+                style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
               />
-              <button type="button" className="btn btn-secondary" style={{ padding: '0.5rem' }} title="Selecionar pasta" onClick={() => imagensInputRef.current?.click()}>
-                <FolderOpen size={18} />
+              <button type="button" className="btn btn-secondary" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }} title="Selecionar pasta" onClick={() => imagensInputRef.current?.click()}>
+                Selecionar Pasta
               </button>
             </div>
-            <input ref={imagensInputRef} type="file" style={{ display: 'none' }} onChange={(e) => {
+            <input ref={imagensInputRef} type="file" multiple style={{ display: 'none' }} onChange={(e) => {
               const files = e.target.files;
               if (files && files.length > 0) {
-                const path = files[0].webkitRelativePath.split('/')[0];
+                const path = `\\\\192.168.15.101\\NasFtp\\CLIENTES\\STOR\\MAPA_LOCAL\\OS_IMAGENS_ANEXADAS\\`;
                 setFormData(prev => ({ ...prev, imagens: path }));
               }
             }} />
-            <small style={{ color: '#71717a', fontSize: '0.75rem' }}>Copie o caminho da pasta no Explorer (Shift+Clique Dir. {'>'} Copiar como caminho) e cole aqui</small>
           </div>
 
           <div className={styles.formActions} style={{ gridColumn: 'span 4' }}>
