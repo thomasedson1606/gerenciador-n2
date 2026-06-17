@@ -234,43 +234,64 @@ const NewRequestTab: React.FC = () => {
           {/* Paths */}
           <div className="input-group" style={{ gridColumn: 'span 2' }}>
             <label>Banco de Dados (Arquivo .rar)</label>
-            <div className="input" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: 0 }} onClick={() => bancoInputRef.current?.click()}>
-              <span style={{ flex: 1, padding: '0.625rem 0.875rem', color: formData.bancoDados ? 'var(--text-main)' : '#52525b' }}>
-                {formData.bancoDados || 'Clique para selecionar .rar...'}
-              </span>
-              <FolderOpen size={18} style={{ marginRight: '0.75rem', color: 'var(--text-muted)' }} />
+            <div style={{ display: 'flex', gap: 4 }}>
+              <input
+                type="text"
+                name="bancoDados"
+                value={formData.bancoDados}
+                onChange={handleInputChange}
+                onPaste={(e) => {
+                  const text = e.clipboardData.getData('text');
+                  if (text) {
+                    e.preventDefault();
+                    setFormData(prev => ({ ...prev, bancoDados: text }));
+                  }
+                }}
+                placeholder="\\192.168.15.101\NasFtp\..."
+                className="input"
+                style={{ flex: 1 }}
+              />
+              <button type="button" className="btn btn-secondary" style={{ padding: '0.5rem' }} title="Selecionar arquivo .rar" onClick={() => bancoInputRef.current?.click()}>
+                <FolderOpen size={18} />
+              </button>
             </div>
-            <input
-              ref={bancoInputRef}
-              type="file"
-              accept=".rar"
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) setFormData(prev => ({ ...prev, bancoDados: file.name }));
-              }}
-            />
+            <input ref={bancoInputRef} type="file" accept=".rar" style={{ display: 'none' }} onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) setFormData(prev => ({ ...prev, bancoDados: file.name }));
+            }} />
+            <small style={{ color: '#71717a', fontSize: '0.75rem' }}>Copie o caminho do arquivo no Explorer (Shift+Clique Dir. {'>'} Copiar como caminho) e cole aqui</small>
           </div>
           <div className="input-group" style={{ gridColumn: 'span 2' }}>
             <label>Imagens (Pasta)</label>
-            <div className="input" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: 0 }} onClick={() => imagensInputRef.current?.click()}>
-              <span style={{ flex: 1, padding: '0.625rem 0.875rem', color: formData.imagens ? 'var(--text-main)' : '#52525b' }}>
-                {formData.imagens || 'Clique para selecionar pasta...'}
-              </span>
-              <FolderOpen size={18} style={{ marginRight: '0.75rem', color: 'var(--text-muted)' }} />
+            <div style={{ display: 'flex', gap: 4 }}>
+              <input
+                type="text"
+                name="imagens"
+                value={formData.imagens}
+                onChange={handleInputChange}
+                onPaste={(e) => {
+                  const text = e.clipboardData.getData('text');
+                  if (text) {
+                    e.preventDefault();
+                    setFormData(prev => ({ ...prev, imagens: text }));
+                  }
+                }}
+                placeholder="\\192.168.15.101\NasFtp\..."
+                className="input"
+                style={{ flex: 1 }}
+              />
+              <button type="button" className="btn btn-secondary" style={{ padding: '0.5rem' }} title="Selecionar pasta" onClick={() => imagensInputRef.current?.click()}>
+                <FolderOpen size={18} />
+              </button>
             </div>
-            <input
-              ref={imagensInputRef}
-              type="file"
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const files = e.target.files;
-                if (files && files.length > 0) {
-                  const path = files[0].webkitRelativePath.split('/')[0];
-                  setFormData(prev => ({ ...prev, imagens: path }));
-                }
-              }}
-            />
+            <input ref={imagensInputRef} type="file" style={{ display: 'none' }} onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                const path = files[0].webkitRelativePath.split('/')[0];
+                setFormData(prev => ({ ...prev, imagens: path }));
+              }
+            }} />
+            <small style={{ color: '#71717a', fontSize: '0.75rem' }}>Copie o caminho da pasta no Explorer (Shift+Clique Dir. {'>'} Copiar como caminho) e cole aqui</small>
           </div>
 
           <div className={styles.formActions} style={{ gridColumn: 'span 4' }}>
