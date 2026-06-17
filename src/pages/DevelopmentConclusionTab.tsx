@@ -68,7 +68,10 @@ const DevelopmentConclusionTab: React.FC = () => {
 
   // Filter requests that reached conclusion phase
   const conclusionRequests = requests.filter(req => 
-    req.numeroDesk && (req.statusDesenvolvimento === 'CORRIGIDA' || req.statusDesenvolvimento === 'REJEITADA')
+    req.numeroDesk && (
+      (req.statusDesenvolvimento === 'CORRIGIDA' && req.sistemaAtualizado !== true) ||
+      req.statusDesenvolvimento === 'REJEITADA'
+    )
   );
 
   const filteredRequests = conclusionRequests.filter(req => {
