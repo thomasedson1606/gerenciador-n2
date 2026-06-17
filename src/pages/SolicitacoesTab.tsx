@@ -20,7 +20,6 @@ Versão Cliente: ${req.versaoCliente}
 Versão Testada: ${req.versaoTestada}
 
 ${req.breveResumo}
-Motivo: ${req.motivo}
 
 Processo:
 ${req.processo}

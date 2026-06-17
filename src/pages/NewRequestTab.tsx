@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../store/AppContext';
 import type { SupportRequest, Prioridade, Sistema, Motivo } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
 import styles from './NewRequestTab.module.css';
-import { Save, X } from 'lucide-react';
+import { Save, X, FolderOpen } from 'lucide-react';
 import { format } from 'date-fns';
 
 const INITIAL_FORM = {
@@ -34,6 +34,8 @@ const NewRequestTab: React.FC = () => {
   
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
+  const bancoInputRef = useRef<HTMLInputElement>(null);
+  const imagensInputRef = useRef<HTMLInputElement>(null);
 
   const resetForm = () => {
     setFormData({ ...INITIAL_FORM, data: format(new Date(), 'dd/MM/yyyy') });
@@ -67,6 +69,11 @@ const NewRequestTab: React.FC = () => {
       setEditingId(req.id);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    const el = imagensInputRef.current;
+    if (el) (el as HTMLInputElement & { webkitdirectory: boolean }).webkitdirectory = true;
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -226,12 +233,44 @@ const NewRequestTab: React.FC = () => {
 
           {/* Paths */}
           <div className="input-group" style={{ gridColumn: 'span 2' }}>
-            <label>Banco de Dados (Caminho da Pasta)</label>
-            <input type="text" name="bancoDados" value={formData.bancoDados} onChange={handleInputChange} placeholder="\\192.168.15.101\NasFtp\..." className="input" />
+            <label>Banco de Dados (Arquivo .rar)</label>
+            <div className="input" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: 0 }} onClick={() => bancoInputRef.current?.click()}>
+              <span style={{ flex: 1, padding: '0.625rem 0.875rem', color: formData.bancoDados ? 'var(--text-main)' : '#52525b' }}>
+                {formData.bancoDados || 'Clique para selecionar .rar...'}
+              </span>
+              <FolderOpen size={18} style={{ marginRight: '0.75rem', color: 'var(--text-muted)' }} />
+            </div>
+            <input
+              ref={bancoInputRef}
+              type="file"
+              accept=".rar"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) setFormData(prev => ({ ...prev, bancoDados: file.name }));
+              }}
+            />
           </div>
           <div className="input-group" style={{ gridColumn: 'span 2' }}>
-            <label>Imagens (Caminho da Pasta)</label>
-            <input type="text" name="imagens" value={formData.imagens} onChange={handleInputChange} placeholder="\\192.168.15.101\NasFtp\..." className="input" />
+            <label>Imagens (Pasta)</label>
+            <div className="input" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: 0 }} onClick={() => imagensInputRef.current?.click()}>
+              <span style={{ flex: 1, padding: '0.625rem 0.875rem', color: formData.imagens ? 'var(--text-main)' : '#52525b' }}>
+                {formData.imagens || 'Clique para selecionar pasta...'}
+              </span>
+              <FolderOpen size={18} style={{ marginRight: '0.75rem', color: 'var(--text-muted)' }} />
+            </div>
+            <input
+              ref={imagensInputRef}
+              type="file"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const files = e.target.files;
+                if (files && files.length > 0) {
+                  const path = files[0].webkitRelativePath.split('/')[0];
+                  setFormData(prev => ({ ...prev, imagens: path }));
+                }
+              }}
+            />
           </div>
 
           <div className={styles.formActions} style={{ gridColumn: 'span 4' }}>
