@@ -3,6 +3,8 @@ import { useAppContext } from '../store/AppContext';
 import { CustomSelect } from '../components/CustomSelect';
 import styles from './NewRequestTab.module.css'; // Reusing some base styles
 import { Save, Trash2 } from 'lucide-react';
+import { doc, updateDoc, deleteField } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 const N3DevelopmentTab: React.FC = () => {
   const { requests, updateRequest } = useAppContext();
@@ -31,10 +33,11 @@ const N3DevelopmentTab: React.FC = () => {
   };
 
   const handleRemoveFromN3 = async (id: string) => {
-    await updateRequest(id, { 
-      numeroDesk: undefined,
-      statusDesenvolvimento: undefined 
+    await updateDoc(doc(db, 'requests', id), {
+      numeroDesk: deleteField(),
+      statusDesenvolvimento: deleteField()
     });
+    // Also sync local state via the onSnapshot listener
   };
 
   return (
