@@ -251,7 +251,14 @@ const NewRequestTab: React.FC = () => {
                 className="input"
                 style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
               />
-              <button type="button" className="btn btn-secondary" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }} title="Selecionar arquivo .rar" onClick={() => bancoInputRef.current?.click()}>
+              <button type="button" className="btn btn-secondary" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }} title="Selecionar arquivo .rar" onClick={async () => {
+                if (window.electronAPI) {
+                  const path = await window.electronAPI.selectRarFile();
+                  if (path) setFormData(prev => ({ ...prev, bancoDados: path }));
+                } else {
+                  bancoInputRef.current?.click();
+                }
+              }}>
                 Importar .RAR
               </button>
             </div>
@@ -279,7 +286,14 @@ const NewRequestTab: React.FC = () => {
                 className="input"
                 style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
               />
-              <button type="button" className="btn btn-secondary" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }} title="Selecionar pasta" onClick={() => imagensInputRef.current?.click()}>
+              <button type="button" className="btn btn-secondary" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }} title="Selecionar pasta" onClick={async () => {
+                if (window.electronAPI) {
+                  const path = await window.electronAPI.selectFolder();
+                  if (path) setFormData(prev => ({ ...prev, imagens: path }));
+                } else {
+                  imagensInputRef.current?.click();
+                }
+              }}>
                 Selecionar Pasta
               </button>
             </div>
