@@ -11,10 +11,22 @@ const N3DevelopmentTab: React.FC = () => {
   
   const [selectedRequestId, setSelectedRequestId] = useState('');
   const [numeroDesk, setNumeroDesk] = useState('');
+  const [filtroOsDesk, setFiltroOsDesk] = useState('');
+  const [filtroDesk, setFiltroDesk] = useState('');
+  const [filtroEmpresa, setFiltroEmpresa] = useState('');
+  const [filtroTitulo, setFiltroTitulo] = useState('');
 
   // Filter requests that are open and don't have a dev desk number yet
   const availableRequests = requests.filter(req => req.situacao === 'ABERTA' && !req.numeroDesk);
   const n3Requests = requests.filter(req => req.numeroDesk);
+
+  const filteredN3 = n3Requests.filter(req => {
+    if (filtroOsDesk && !(req.numeroOSDesk ?? '').toLowerCase().includes(filtroOsDesk.toLowerCase())) return false;
+    if (filtroDesk && !req.numeroDesk.toLowerCase().includes(filtroDesk.toLowerCase())) return false;
+    if (filtroEmpresa && !req.licencaEmpresa.toLowerCase().includes(filtroEmpresa.toLowerCase())) return false;
+    if (filtroTitulo && !req.titulo.toLowerCase().includes(filtroTitulo.toLowerCase())) return false;
+    return true;
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,12 +96,36 @@ const N3DevelopmentTab: React.FC = () => {
 
       <div className={styles.gridSection}>
         <h2 className="title-2" style={{marginTop: '2rem'}}>Solicitações em Desenvolvimento</h2>
+        
+        {/* Filters */}
+        <div className="card" style={{ marginBottom: '1rem' }}>
+          <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+            <div className="input-group">
+              <label>Nº O.S Desk</label>
+              <input type="text" value={filtroOsDesk} onChange={e => setFiltroOsDesk(e.target.value)} className="input" placeholder="Filtrar..." />
+            </div>
+            <div className="input-group">
+              <label>Nº Desk</label>
+              <input type="text" value={filtroDesk} onChange={e => setFiltroDesk(e.target.value)} className="input" placeholder="Filtrar..." />
+            </div>
+            <div className="input-group">
+              <label>Empresa</label>
+              <input type="text" value={filtroEmpresa} onChange={e => setFiltroEmpresa(e.target.value)} className="input" placeholder="Filtrar..." />
+            </div>
+            <div className="input-group">
+              <label>Título</label>
+              <input type="text" value={filtroTitulo} onChange={e => setFiltroTitulo(e.target.value)} className="input" placeholder="Filtrar..." />
+            </div>
+          </div>
+        </div>
+
         <div className="card" style={{ padding: 0, overflow: 'clip' }}>
           <div className={styles.tableResponsive}>
             <table className={styles.table}>
               <thead>
                 <tr>
                   <th>Cód. Suporte</th>
+                  <th>Nº O.S Desk</th>
                   <th>Número DESK</th>
                   <th>Empresa</th>
                   <th>Título</th>
@@ -97,12 +133,13 @@ const N3DevelopmentTab: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {n3Requests.length === 0 ? (
-                  <tr><td colSpan={5} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhuma solicitação no N3.</td></tr>
+                {filteredN3.length === 0 ? (
+                  <tr><td colSpan={6} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhuma solicitação no N3.</td></tr>
                 ) : (
-                  n3Requests.map(req => (
+                  filteredN3.map(req => (
                     <tr key={req.id}>
                       <td><strong>{req.codigo}</strong></td>
+                      <td>{req.numeroOSDesk || '-'}</td>
                       <td><strong>{req.numeroDesk}</strong></td>
                       <td>{req.licencaEmpresa}</td>
                       <td>{req.titulo}</td>

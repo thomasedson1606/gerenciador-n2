@@ -257,10 +257,7 @@ const NewRequestTab: React.FC = () => {
             </div>
             <input ref={bancoInputRef} type="file" accept=".rar" style={{ display: 'none' }} onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) {
-                const path = `\\\\192.168.15.101\\NasFtp\\CLIENTES\\STOR\\MAPA_LOCAL\\${file.name}`;
-                setFormData(prev => ({ ...prev, bancoDados: path }));
-              }
+              if (file) setFormData(prev => ({ ...prev, bancoDados: file.name }));
             }} />
           </div>
           <div className="input-group" style={{ gridColumn: 'span 2' }}>
@@ -289,7 +286,7 @@ const NewRequestTab: React.FC = () => {
             <input ref={imagensInputRef} type="file" multiple style={{ display: 'none' }} onChange={(e) => {
               const files = e.target.files;
               if (files && files.length > 0) {
-                const path = `\\\\192.168.15.101\\NasFtp\\CLIENTES\\STOR\\MAPA_LOCAL\\OS_IMAGENS_ANEXADAS\\`;
+                const path = files[0].webkitRelativePath.split('/')[0];
                 setFormData(prev => ({ ...prev, imagens: path }));
               }
             }} />
