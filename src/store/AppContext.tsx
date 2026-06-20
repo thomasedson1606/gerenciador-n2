@@ -34,7 +34,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Sync from Firestore in real-time
   useEffect(() => {
-    const q = query(collection(db, COLLECTION), orderBy('codigo'));
+    const q = query(collection(db, COLLECTION), orderBy('codigo', 'desc'));
     const unsub = onSnapshot(q, (snapshot) => {
       const list: SupportRequest[] = [];
       snapshot.forEach((d) => {

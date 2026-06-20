@@ -247,7 +247,7 @@ const NewRequestTab: React.FC = () => {
                     setFormData(prev => ({ ...prev, bancoDados: text }));
                   }
                 }}
-                placeholder="Nenhum arquivo ou caminho mapeado"
+                placeholder="Cole o caminho completo \\servidor\pasta\...\arquivo.rar"
                 className="input"
                 style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
               />
@@ -282,7 +282,7 @@ const NewRequestTab: React.FC = () => {
                     setFormData(prev => ({ ...prev, imagens: text }));
                   }
                 }}
-                placeholder="Nenhum diretório ou caminho mapeado"
+                placeholder="Cole o caminho completo \\servidor\pasta\...\pasta\"
                 className="input"
                 style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
               />
