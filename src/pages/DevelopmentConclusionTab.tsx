@@ -10,6 +10,8 @@ const DevelopmentConclusionTab: React.FC = () => {
   
   const [filterStatus, setFilterStatus] = useState<string>('TODAS');
   const [filterEmpresa, setFilterEmpresa] = useState<string>('');
+  const [filterDesk, setFilterDesk] = useState<string>('');
+  const [filterOsDesk, setFilterOsDesk] = useState<string>('');
 
   // Local state to manage form fields for specific requests being edited
   const [editForms, setEditForms] = useState<Record<string, {
@@ -77,6 +79,8 @@ const DevelopmentConclusionTab: React.FC = () => {
   const filteredRequests = conclusionRequests.filter(req => {
     if (filterStatus !== 'TODAS' && req.statusDesenvolvimento !== filterStatus) return false;
     if (filterEmpresa && !req.licencaEmpresa.toLowerCase().includes(filterEmpresa.toLowerCase())) return false;
+    if (filterDesk && !req.numeroDesk.toLowerCase().includes(filterDesk.toLowerCase())) return false;
+    if (filterOsDesk && !(req.numeroOSDesk ?? '').toLowerCase().includes(filterOsDesk.toLowerCase())) return false;
     return true;
   });
 
@@ -88,7 +92,7 @@ const DevelopmentConclusionTab: React.FC = () => {
       </div>
 
       <div className="card">
-        <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
           <div className="input-group">
             <label>Status</label>
             <CustomSelect
@@ -104,6 +108,14 @@ const DevelopmentConclusionTab: React.FC = () => {
           <div className="input-group">
             <label>Licença - Empresa</label>
             <input type="text" value={filterEmpresa} onChange={e => setFilterEmpresa(e.target.value)} className="input" placeholder="Buscar..." />
+          </div>
+          <div className="input-group">
+            <label>Nº Desk</label>
+            <input type="text" value={filterDesk} onChange={e => setFilterDesk(e.target.value)} className="input" placeholder="Filtrar..." />
+          </div>
+          <div className="input-group">
+            <label>Nº O.S Desk</label>
+            <input type="text" value={filterOsDesk} onChange={e => setFilterOsDesk(e.target.value)} className="input" placeholder="Filtrar..." />
           </div>
         </div>
       </div>

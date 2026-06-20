@@ -19,6 +19,8 @@ const DevelopmentFlowTab: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [filterSistema, setFilterSistema] = useState<string>('');
   const [filterEmpresa, setFilterEmpresa] = useState<string>('');
+  const [filterDesk, setFilterDesk] = useState<string>('');
+  const [filterOsDesk, setFilterOsDesk] = useState<string>('');
   
   const [hasQueried, setHasQueried] = useState(false);
 
@@ -29,6 +31,8 @@ const DevelopmentFlowTab: React.FC = () => {
     if (filterStatus && req.statusDesenvolvimento !== filterStatus) return false;
     if (filterSistema && req.sistema !== filterSistema) return false;
     if (filterEmpresa && !req.licencaEmpresa.toLowerCase().includes(filterEmpresa.toLowerCase())) return false;
+    if (filterDesk && !req.numeroDesk.toLowerCase().includes(filterDesk.toLowerCase())) return false;
+    if (filterOsDesk && !(req.numeroOSDesk ?? '').toLowerCase().includes(filterOsDesk.toLowerCase())) return false;
     return true;
   });
 
@@ -48,7 +52,7 @@ const DevelopmentFlowTab: React.FC = () => {
       </div>
 
       <div className="card">
-        <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', alignItems: 'end' }}>
+        <div className={styles.formGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', alignItems: 'end' }}>
           <div className="input-group">
             <label>Status Desenvolvimento</label>
             <CustomSelect
@@ -77,6 +81,14 @@ const DevelopmentFlowTab: React.FC = () => {
             />
           </div>
           <div className="input-group">
+            <label>Nº Desk</label>
+            <input type="text" value={filterDesk} onChange={e => setFilterDesk(e.target.value)} className="input" placeholder="Filtrar..." />
+          </div>
+          <div className="input-group">
+            <label>Nº O.S Desk</label>
+            <input type="text" value={filterOsDesk} onChange={e => setFilterOsDesk(e.target.value)} className="input" placeholder="Filtrar..." />
+          </div>
+          <div className="input-group">
             <label>Licença - Empresa</label>
             <input type="text" value={filterEmpresa} onChange={e => setFilterEmpresa(e.target.value)} className="input" placeholder="Buscar..." />
           </div>
@@ -98,6 +110,7 @@ const DevelopmentFlowTab: React.FC = () => {
                     <th>Cód. Sup.</th>
                     <th>Empresa</th>
                     <th>Nº DESK</th>
+                    <th>Nº O.S Desk</th>
                     <th>Sistema</th>
                     <th>Solicitante</th>
                     <th>Status Desenvolvimento</th>
@@ -105,13 +118,14 @@ const DevelopmentFlowTab: React.FC = () => {
                 </thead>
                 <tbody>
                   {filteredRequests.length === 0 ? (
-                    <tr><td colSpan={6} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhuma solicitação encontrada.</td></tr>
+                    <tr><td colSpan={7} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>Nenhuma solicitação encontrada.</td></tr>
                   ) : (
                     filteredRequests.map(req => (
                       <tr key={req.id}>
                         <td><strong>{req.codigo}</strong></td>
                         <td>{req.licencaEmpresa}</td>
                         <td>{req.numeroDesk}</td>
+                        <td>{req.numeroOSDesk || '-'}</td>
                         <td>{req.sistema}</td>
                         <td>{req.solicitante}</td>
                         <td>
