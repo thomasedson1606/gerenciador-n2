@@ -61,8 +61,24 @@ const ReportsTab: React.FC = () => {
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+
+    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+    const usablePage = pageHeight - margin * 2;
+    let heightLeft = imgHeight;
+    let position = margin;
+
+    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+    heightLeft -= usablePage;
+
+    while (heightLeft > 0) {
+      position = -(imgHeight - heightLeft) + margin;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= usablePage;
+    }
+
     pdf.save('relatorio-n2.pdf');
   };
 
