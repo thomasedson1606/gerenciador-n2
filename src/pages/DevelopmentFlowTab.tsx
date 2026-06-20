@@ -41,7 +41,9 @@ const DevelopmentFlowTab: React.FC = () => {
   };
 
   const handleStatusChange = async (id: string, newStatus: StatusDesenvolvimento) => {
-    await updateRequest(id, { statusDesenvolvimento: newStatus });
+    const payload: Record<string, string> = { statusDesenvolvimento: newStatus };
+    if (newStatus === 'CORRIGIDA') payload.situacao = 'CORRIGIDA';
+    await updateRequest(id, payload);
   };
 
   return (

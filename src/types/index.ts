@@ -1,7 +1,7 @@
 export type Prioridade = 'CRÍTICA' | 'ALTA' | 'MÉDIA' | 'BAIXA' | 'MÍNIMA';
 export type Sistema = 'STOR' | 'AGRO';
 export type Motivo = 'Bugs' | 'Regulatório' | 'Melhoria do Cliente' | 'Melhoria da Stor';
-export type SituacaoSuporte = 'ABERTA' | 'CORRIGIDA' | 'FINALIZADA';
+export type SituacaoSuporte = 'NOVO' | 'ABERTA' | 'CORRIGIDA' | 'FINALIZADA';
 export type StatusDesenvolvimento = 'EM ANALISE' | 'EM DESENVOLVIMENTO' | 'CORRIGIDA' | 'REJEITADA' | 'FINALIZADA';
 
 export interface SupportRequest {

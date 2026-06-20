@@ -16,8 +16,8 @@ const N3DevelopmentTab: React.FC = () => {
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
   const [filtroTitulo, setFiltroTitulo] = useState('');
 
-  // Filter requests that are open and don't have a dev desk number yet
-  const availableRequests = requests.filter(req => req.situacao === 'ABERTA' && !req.numeroDesk);
+  // Requests without N3 link yet
+  const availableRequests = requests.filter(req => req.situacao === 'NOVO' && !req.numeroDesk);
   const n3Requests = requests.filter(req => req.numeroDesk);
 
   const filteredN3 = n3Requests.filter(req => {
@@ -37,6 +37,7 @@ const N3DevelopmentTab: React.FC = () => {
     
     await updateRequest(selectedRequestId, { 
       numeroDesk,
+      situacao: 'ABERTA',
       statusDesenvolvimento: 'EM ANALISE'
     });
     
@@ -47,9 +48,9 @@ const N3DevelopmentTab: React.FC = () => {
   const handleRemoveFromN3 = async (id: string) => {
     await updateDoc(doc(db, 'requests', id), {
       numeroDesk: deleteField(),
-      statusDesenvolvimento: deleteField()
+      statusDesenvolvimento: deleteField(),
+      situacao: 'NOVO'
     });
-    // Also sync local state via the onSnapshot listener
   };
 
   return (

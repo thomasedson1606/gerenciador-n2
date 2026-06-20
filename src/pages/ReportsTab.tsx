@@ -133,7 +133,17 @@ const ReportsTab: React.FC = () => {
           </div>
           <div className="input-group">
             <label>Status</label>
-            <input type="text" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="input" placeholder="Ex: FINALIZADA" />
+            <CustomSelect
+              value={filterStatus}
+              onChange={setFilterStatus}
+              options={[
+                { value: '', label: 'TODAS' },
+                { value: 'NOVO', label: 'NOVO' },
+                { value: 'ABERTA', label: 'ABERTA' },
+                { value: 'CORRIGIDA', label: 'CORRIGIDA' },
+                { value: 'FINALIZADA', label: 'FINALIZADA' }
+              ]}
+            />
           </div>
           <div className="input-group">
             <label>Versão Corrigida</label>

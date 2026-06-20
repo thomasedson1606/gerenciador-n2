@@ -85,6 +85,7 @@ const SolicitacoesTab: React.FC = () => {
               onChange={setFilterSituacao}
               options={[
                 { value: '', label: 'TODAS' },
+                { value: 'NOVO', label: 'NOVO' },
                 { value: 'ABERTA', label: 'ABERTA' },
                 { value: 'CORRIGIDA', label: 'CORRIGIDA' },
                 { value: 'FINALIZADA', label: 'FINALIZADA' }

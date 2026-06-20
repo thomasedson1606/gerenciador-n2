@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 
 const INITIAL_FORM = {
   data: format(new Date(), 'dd/MM/yyyy'),
-  situacao: 'ABERTA' as SupportRequest['situacao'],
+  situacao: 'NOVO' as SupportRequest['situacao'],
   titulo: '',
   prioridade: 'MÉDIA' as Prioridade,
   sistema: 'STOR' as Sistema,
@@ -180,6 +180,7 @@ const NewRequestTab: React.FC = () => {
               value={formData.situacao}
               onChange={(val) => setFormData({...formData, situacao: val as SupportRequest['situacao']})}
               options={[
+                { value: 'NOVO', label: 'NOVO' },
                 { value: 'ABERTA', label: 'ABERTA' },
                 { value: 'CORRIGIDA', label: 'CORRIGIDA' },
                 { value: 'FINALIZADA', label: 'FINALIZADA' }
