@@ -58,25 +58,29 @@ const ReportsTab: React.FC = () => {
   const handleExportPDF = async () => {
     const canvas = await captureTable();
     if (!canvas) return;
-    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 10;
+    const margin = 5;
 
-    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-    const usablePage = pageHeight - margin * 2;
-    let heightLeft = imgHeight;
-    let position = margin;
+    const pxPerMm = canvas.width / pdfWidth;
+    const totalPages = Math.ceil(canvas.height / (pxPerMm * (pageHeight - margin * 2)));
 
-    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-    heightLeft -= usablePage;
+    for (let i = 0; i < totalPages; i++) {
+      if (i > 0) pdf.addPage();
 
-    while (heightLeft > 0) {
-      position = -(imgHeight - heightLeft) + margin;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-      heightLeft -= usablePage;
+      const yStartPx = i * pxPerMm * (pageHeight - margin * 2);
+      const sliceHeightPx = Math.min(pxPerMm * (pageHeight - margin * 2), canvas.height - yStartPx);
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = sliceHeightPx;
+      const ctx = tempCanvas.getContext('2d');
+      if (ctx) ctx.drawImage(canvas, 0, yStartPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+
+      const sliceData = tempCanvas.toDataURL('image/png');
+      const sliceHeightMm = sliceHeightPx / pxPerMm;
+      pdf.addImage(sliceData, 'PNG', 0, margin, pdfWidth, sliceHeightMm);
     }
 
     pdf.save('relatorio-n2.pdf');
