@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../store/AppContext';
 import type { SupportRequest, Prioridade, Sistema, Motivo } from '../types';
@@ -24,6 +24,9 @@ const INITIAL_FORM = {
   observacaoComplementar: '',
   bancoDados: '',
   imagens: '',
+  subpasta: '',
+  nomeArquivo: '',
+  subpastaImagens: '',
   numeroDesk: ''
 };
 
@@ -34,8 +37,6 @@ const NewRequestTab: React.FC = () => {
   
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
-  const bancoInputRef = useRef<HTMLInputElement>(null);
-  const imagensInputRef = useRef<HTMLInputElement>(null);
 
   const resetForm = () => {
     setFormData({ ...INITIAL_FORM, data: format(new Date(), 'dd/MM/yyyy') });
@@ -47,7 +48,22 @@ const NewRequestTab: React.FC = () => {
     const state = location.state as { editingRequest?: SupportRequest } | null;
     if (state?.editingRequest) {
       const req = state.editingRequest;
-      setFormData({
+      // Try to extract subpasta and nomeArquivo from existing bancoDados
+      let subpasta = '';
+      let nomeArquivo = '';
+      let subpastaImagens = '';
+      if (req.bancoDados) {
+        const parts = req.bancoDados.split('\\');
+        if (parts.length >= 2) {
+          nomeArquivo = parts[parts.length - 1];
+          subpasta = parts[parts.length - 2];
+        }
+      }
+      if (req.imagens) {
+        const parts = req.imagens.split('\\');
+        if (parts.length >= 2) subpastaImagens = parts[parts.length - 2];
+      }
+      setFormData({ ...INITIAL_FORM,
         data: req.data,
         situacao: req.situacao,
         titulo: req.titulo,
@@ -64,16 +80,14 @@ const NewRequestTab: React.FC = () => {
         observacaoComplementar: req.observacaoComplementar,
         bancoDados: req.bancoDados,
         imagens: req.imagens,
+        subpasta,
+        nomeArquivo,
+        subpastaImagens,
         numeroDesk: req.numeroDesk
       });
       setEditingId(req.id);
     }
   }, [location.state]);
-
-  useEffect(() => {
-    const el = imagensInputRef.current;
-    if (el) (el as HTMLInputElement & { webkitdirectory: boolean }).webkitdirectory = true;
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -113,10 +127,38 @@ const NewRequestTab: React.FC = () => {
       return;
     }
     
+    const prefix = `\\\\192.168.15.101\\NasFtp\\CLIENTES\\STOR\\`;
+    const bancoDados = formData.subpasta || formData.nomeArquivo
+      ? `${prefix}${formData.licencaEmpresa}\\${formData.subpasta}\\${formData.nomeArquivo}`
+      : formData.bancoDados;
+    const imagens = formData.subpastaImagens
+      ? `${prefix}${formData.licencaEmpresa}\\${formData.subpastaImagens}\\`
+      : formData.imagens;
+
+    const dataToSave = {
+      data: formData.data,
+      situacao: formData.situacao,
+      titulo: formData.titulo,
+      prioridade: formData.prioridade,
+      sistema: formData.sistema,
+      motivo: formData.motivo,
+      licencaEmpresa: formData.licencaEmpresa,
+      numeroOSDesk: formData.numeroOSDesk,
+      solicitante: formData.solicitante,
+      versaoTestada: formData.versaoTestada,
+      versaoCliente: formData.versaoCliente,
+      breveResumo: formData.breveResumo,
+      processo: formData.processo,
+      observacaoComplementar: formData.observacaoComplementar,
+      bancoDados,
+      imagens,
+      numeroDesk: formData.numeroDesk,
+    };
+
     if (editingId) {
-      await updateRequest(editingId, formData);
+      await updateRequest(editingId, dataToSave);
     } else {
-      await addRequest(formData);
+      await addRequest(dataToSave);
     }
     
     resetForm();
@@ -232,78 +274,17 @@ const NewRequestTab: React.FC = () => {
           </div>
 
           {/* Paths */}
-          <div className="input-group" style={{ gridColumn: 'span 2' }}>
-            <label>Banco de Dados (Arquivo .rar)</label>
-            <div style={{ display: 'flex', gap: 4 }}>
-              <input
-                type="text"
-                name="bancoDados"
-                value={formData.bancoDados}
-                onChange={handleInputChange}
-                onPaste={(e) => {
-                  const text = e.clipboardData.getData('text');
-                  if (text) {
-                    e.preventDefault();
-                    setFormData(prev => ({ ...prev, bancoDados: text }));
-                  }
-                }}
-                placeholder="Cole o caminho completo \\servidor\pasta\...\arquivo.rar"
-                className="input"
-                style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
-              />
-              <button type="button" className="btn btn-secondary" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }} title="Selecionar arquivo .rar" onClick={async () => {
-                if (window.electronAPI) {
-                  const path = await window.electronAPI.selectRarFile();
-                  if (path) setFormData(prev => ({ ...prev, bancoDados: path }));
-                } else {
-                  bancoInputRef.current?.click();
-                }
-              }}>
-                Importar .RAR
-              </button>
-            </div>
-            <input ref={bancoInputRef} type="file" accept=".rar" style={{ display: 'none' }} onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) setFormData(prev => ({ ...prev, bancoDados: file.name }));
-            }} />
+          <div className="input-group" style={{ gridColumn: 'span 1' }}>
+            <label>Subpasta (Ex: "OS 12160 - Erro ISW")</label>
+            <input type="text" name="subpasta" value={formData.subpasta} onChange={handleInputChange} className="input" placeholder="Nome da subpasta..." />
           </div>
-          <div className="input-group" style={{ gridColumn: 'span 2' }}>
-            <label>Imagens (Pasta)</label>
-            <div style={{ display: 'flex', gap: 4 }}>
-              <input
-                type="text"
-                name="imagens"
-                value={formData.imagens}
-                onChange={handleInputChange}
-                onPaste={(e) => {
-                  const text = e.clipboardData.getData('text');
-                  if (text) {
-                    e.preventDefault();
-                    setFormData(prev => ({ ...prev, imagens: text }));
-                  }
-                }}
-                placeholder="Cole o caminho completo \\servidor\pasta\...\pasta\"
-                className="input"
-                style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
-              />
-              <button type="button" className="btn btn-secondary" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }} title="Selecionar pasta" onClick={async () => {
-                if (window.electronAPI) {
-                  const path = await window.electronAPI.selectFolder();
-                  if (path) setFormData(prev => ({ ...prev, imagens: path }));
-                } else {
-                  imagensInputRef.current?.click();
-                }
-              }}>
-                Selecionar Pasta
-              </button>
-            </div>
-            <input ref={imagensInputRef} type="file" multiple style={{ display: 'none' }} onChange={(e) => {
-              const files = e.target.files;
-              if (files && files.length > 0) {
-                const path = files[0].webkitRelativePath.split('/')[0];
-                setFormData(prev => ({ ...prev, imagens: path }));
-              }
-            }} />
+          <div className="input-group" style={{ gridColumn: 'span 1' }}>
+            <label>Nome do Arquivo .rar</label>
+            <input type="text" name="nomeArquivo" value={formData.nomeArquivo} onChange={handleInputChange} className="input" placeholder="Ex: BKP 17062026 2022.rar" />
+          </div>
+          <div className="input-group" style={{ gridColumn: 'span 1' }}>
+            <label>Subpasta Imagens</label>
+            <input type="text" name="subpastaImagens" value={formData.subpastaImagens} onChange={handleInputChange} className="input" placeholder="Ex: OS 12160 - Erro ISW" />
           </div>
 
           <div className={styles.formActions} style={{ gridColumn: 'span 4' }}>
