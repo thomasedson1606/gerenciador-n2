@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '../store/AppContext';
 import { CustomSelect } from '../components/CustomSelect';
 import type { StatusDesenvolvimento } from '../types';
 import styles from './NewRequestTab.module.css'; // Reusing base styles
-import { Search } from 'lucide-react';
+import { Search, Check } from 'lucide-react';
 
 const statusOptions: StatusDesenvolvimento[] = [
   'EM ANALISE', 
@@ -23,6 +23,8 @@ const DevelopmentFlowTab: React.FC = () => {
   const [filterOsDesk, setFilterOsDesk] = useState<string>('');
   
   const [hasQueried, setHasQueried] = useState(false);
+  const [activePopupId, setActivePopupId] = useState<string | null>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
 
   const n3Requests = requests.filter(req => req.numeroDesk);
   
@@ -44,6 +46,22 @@ const DevelopmentFlowTab: React.FC = () => {
     const payload: Record<string, string> = { statusDesenvolvimento: newStatus };
     if (newStatus === 'CORRIGIDA') payload.situacao = 'CORRIGIDA';
     await updateRequest(id, payload);
+    setActivePopupId(null);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
+        setActivePopupId(null);
+      }
+    };
+    if (activePopupId) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activePopupId]);
+
+  const statusBadgeClass = (status: string) => {
+    const key = status.replace(/ /g, '').toLowerCase();
+    return styles['badge-' + key] || '';
   };
 
   return (
@@ -131,11 +149,58 @@ const DevelopmentFlowTab: React.FC = () => {
                         <td>{req.sistema}</td>
                         <td>{req.solicitante}</td>
                         <td>
-                          <CustomSelect
-                            value={req.statusDesenvolvimento || ''}
-                            onChange={(val) => handleStatusChange(req.id, val as StatusDesenvolvimento)}
-                            options={statusOptions.map(opt => ({ value: opt, label: opt }))}
-                          />
+                          <div style={{ position: 'relative' }}>
+                            <span
+                              className={`${styles.badge} ${statusBadgeClass(req.statusDesenvolvimento || '')}`}
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => setActivePopupId(activePopupId === req.id ? null : req.id)}
+                            >
+                              {req.statusDesenvolvimento || '-'}
+                            </span>
+                            {activePopupId === req.id && (
+                              <div
+                                ref={popupRef}
+                                style={{
+                                  position: 'absolute',
+                                  top: '100%',
+                                  left: 0,
+                                  zIndex: 100,
+                                  background: 'var(--bg-surface)',
+                                  border: '1px solid var(--input-border)',
+                                  borderRadius: '8px',
+                                  boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+                                  minWidth: '200px',
+                                  padding: '4px',
+                                }}
+                              >
+                                {statusOptions.map(opt => (
+                                  <button
+                                    key={opt}
+                                    onClick={() => handleStatusChange(req.id, opt)}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      width: '100%',
+                                      padding: '8px 12px',
+                                      border: 'none',
+                                      background: req.statusDesenvolvimento === opt ? 'var(--bg-hover)' : 'transparent',
+                                      color: 'var(--text-main)',
+                                      cursor: 'pointer',
+                                      borderRadius: '6px',
+                                      fontSize: '0.875rem',
+                                      textAlign: 'left',
+                                    }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-hover)')}
+                                    onMouseLeave={e => { if (req.statusDesenvolvimento !== opt) e.currentTarget.style.background = 'transparent'; }}
+                                  >
+                                    <span className={`${styles.badge} ${statusBadgeClass(opt)}`}>{opt}</span>
+                                    {req.statusDesenvolvimento === opt && <Check size={16} />}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
