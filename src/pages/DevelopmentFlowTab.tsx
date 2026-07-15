@@ -46,6 +46,11 @@ const DevelopmentFlowTab: React.FC = () => {
     await updateRequest(id, payload);
   };
 
+  const statusBadgeClass = (status: string) => {
+    const key = status.replace(/ /g, '').toLowerCase();
+    return styles['badge-' + key] || '';
+  };
+
   return (
     <div className="animate-fade-in">
       <div className={styles.header}>
@@ -135,6 +140,7 @@ const DevelopmentFlowTab: React.FC = () => {
                             value={req.statusDesenvolvimento || ''}
                             onChange={(val) => handleStatusChange(req.id, val as StatusDesenvolvimento)}
                             options={statusOptions.map(opt => ({ value: opt, label: opt }))}
+                            optionClass={statusBadgeClass}
                           />
                         </td>
                       </tr>

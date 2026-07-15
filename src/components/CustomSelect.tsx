@@ -14,6 +14,7 @@ interface CustomSelectProps {
   placeholder?: string;
   className?: string;
   name?: string;
+  optionClass?: (value: string) => string;
 }
 
 export const CustomSelect: React.FC<CustomSelectProps> = ({ 
@@ -22,7 +23,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   options, 
   placeholder = 'Selecione...',
   className = '',
-  name
+  name,
+  optionClass
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,7 +53,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         tabIndex={0}
       >
-        <span className={selectedOption ? styles.value : styles.placeholder}>
+        <span className={`${selectedOption ? styles.value : styles.placeholder} ${(selectedOption && optionClass)?.(value) || ''}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <ChevronDown size={16} className={`${styles.icon} ${isOpen ? styles.iconOpen : ''}`} />
@@ -71,7 +73,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
                 className={`${styles.option} ${option.value === value ? styles.selected : ''}`}
                 onClick={() => handleSelect(option.value)}
               >
-                {option.label}
+                <span className={optionClass?.(option.value) || ''}>{option.label}</span>
               </div>
             ))
           )}
