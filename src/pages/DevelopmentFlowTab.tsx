@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useAppContext } from '../store/AppContext';
 import { CustomSelect } from '../components/CustomSelect';
 import type { StatusDesenvolvimento } from '../types';
@@ -24,12 +23,7 @@ const DevelopmentFlowTab: React.FC = () => {
   const [filterOsDesk, setFilterOsDesk] = useState<string>('');
   
   const [hasQueried, setHasQueried] = useState(false);
-  const [statusPopup, setStatusPopup] = useState<{
-    id: string;
-    current: string;
-    top: number;
-    left: number;
-  } | null>(null);
+  const [modalData, setModalData] = useState<{ id: string; current: string } | null>(null);
 
   const n3Requests = requests.filter(req => req.numeroDesk);
   
@@ -48,10 +42,14 @@ const DevelopmentFlowTab: React.FC = () => {
   };
 
   const handleStatusChange = async (id: string, newStatus: StatusDesenvolvimento) => {
-    const payload: Record<string, string> = { statusDesenvolvimento: newStatus };
-    if (newStatus === 'CORRIGIDA') payload.situacao = 'CORRIGIDA';
-    await updateRequest(id, payload);
-    setStatusPopup(null);
+    try {
+      const payload: Record<string, string> = { statusDesenvolvimento: newStatus };
+      if (newStatus === 'CORRIGIDA') payload.situacao = 'CORRIGIDA';
+      await updateRequest(id, payload);
+      setModalData(null);
+    } catch (err) {
+      alert('Erro ao alterar status: ' + (err instanceof Error ? err.message : 'desconhecido'));
+    }
   };
 
   const statusBadgeClass = (status: string) => {
@@ -117,7 +115,7 @@ const DevelopmentFlowTab: React.FC = () => {
 
       {hasQueried && (
         <div className={styles.gridSection}>
-          <div className="card" style={{ padding: 0 }}>
+          <div className="card" style={{ padding: 0, overflow: 'clip' }}>
             <div className={styles.tableResponsive}>
               <table className={styles.table}>
                 <thead>
@@ -147,15 +145,7 @@ const DevelopmentFlowTab: React.FC = () => {
                           <span
                             className={`${styles.badge} ${statusBadgeClass(req.statusDesenvolvimento || '')}`}
                             style={{ cursor: 'pointer' }}
-                            onClick={(e) => {
-                              const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                              setStatusPopup({
-                                id: req.id,
-                                current: req.statusDesenvolvimento || '',
-                                top: rect.bottom + 4,
-                                left: rect.left,
-                              });
-                            }}
+                            onClick={() => setModalData({ id: req.id, current: req.statusDesenvolvimento || '' })}
                           >
                             {req.statusDesenvolvimento || '-'}
                           </span>
@@ -170,62 +160,64 @@ const DevelopmentFlowTab: React.FC = () => {
         </div>
       )}
 
-      {statusPopup && createPortal(
-        <>
+      {modalData && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.5)',
+          }}
+          onClick={() => setModalData(null)}
+        >
           <div
-            style={{ position: 'fixed', inset: 0, zIndex: 998 }}
-            onClick={() => setStatusPopup(null)}
-          />
-          <div
+            onClick={e => e.stopPropagation()}
             style={{
-              position: 'fixed',
-              top: statusPopup.top,
-              left: statusPopup.left,
-              zIndex: 999,
               background: 'var(--bg-surface)',
-              border: '1px solid var(--input-border)',
-              borderRadius: '8px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-              minWidth: '200px',
-              padding: '4px',
+              borderRadius: '12px',
+              padding: '8px',
+              minWidth: '260px',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.4)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px 4px 0' }}>
               <button
-                onClick={() => setStatusPopup(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px' }}
+                onClick={() => setModalData(null)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
             {statusOptions.map(opt => (
               <button
                 key={opt}
-                onClick={() => handleStatusChange(statusPopup.id, opt)}
+                onClick={() => handleStatusChange(modalData.id, opt)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   width: '100%',
-                  padding: '8px 12px',
+                  padding: '10px 14px',
                   border: 'none',
-                  background: statusPopup.current === opt ? 'var(--bg-hover)' : 'transparent',
+                  background: modalData.current === opt ? 'var(--bg-hover)' : 'transparent',
                   color: 'var(--text-main)',
                   cursor: 'pointer',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
+                  borderRadius: '8px',
+                  fontSize: '0.9rem',
                   textAlign: 'left',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-hover)')}
-                onMouseLeave={e => { if (statusPopup.current !== opt) e.currentTarget.style.background = 'transparent'; }}
+                onMouseLeave={e => { if (modalData.current !== opt) e.currentTarget.style.background = 'transparent'; }}
               >
-                <span className={`${styles.badge} ${statusBadgeClass(opt)}`}>{opt}</span>
-                {statusPopup.current === opt && <Check size={16} />}
+                <span className={`${styles.badge} ${statusBadgeClass(opt)}`} style={{ fontSize: '0.8rem' }}>{opt}</span>
+                {modalData.current === opt && <Check size={18} />}
               </button>
             ))}
           </div>
-        </>,
-        document.body
+        </div>
       )}
     </div>
   );
