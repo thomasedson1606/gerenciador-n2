@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useAppContext } from '../store/AppContext';
 import { CustomSelect } from '../components/CustomSelect';
 import type { StatusDesenvolvimento } from '../types';
-import styles from './NewRequestTab.module.css';
-import { Search, Check } from 'lucide-react';
+import styles from './NewRequestTab.module.css'; // Reusing base styles
+import { Search } from 'lucide-react';
 
 const statusOptions: StatusDesenvolvimento[] = [
   'EM ANALISE', 
@@ -23,12 +23,6 @@ const DevelopmentFlowTab: React.FC = () => {
   const [filterOsDesk, setFilterOsDesk] = useState<string>('');
   
   const [hasQueried, setHasQueried] = useState(false);
-  const [statusPicker, setStatusPicker] = useState<{
-    id: string;
-    current: string;
-    top: number;
-    left: number;
-  } | null>(null);
 
   const n3Requests = requests.filter(req => req.numeroDesk);
   
@@ -47,19 +41,9 @@ const DevelopmentFlowTab: React.FC = () => {
   };
 
   const handleStatusChange = async (id: string, newStatus: StatusDesenvolvimento) => {
-    try {
-      const payload: Record<string, string> = { statusDesenvolvimento: newStatus };
-      if (newStatus === 'CORRIGIDA') payload.situacao = 'CORRIGIDA';
-      await updateRequest(id, payload);
-      setStatusPicker(null);
-    } catch (err) {
-      alert('Erro ao alterar status: ' + (err instanceof Error ? err.message : 'desconhecido'));
-    }
-  };
-
-  const statusBadgeClass = (status: string) => {
-    const key = status.replace(/ /g, '').toLowerCase();
-    return styles['badge-' + key] || '';
+    const payload: Record<string, string> = { statusDesenvolvimento: newStatus };
+    if (newStatus === 'CORRIGIDA') payload.situacao = 'CORRIGIDA';
+    await updateRequest(id, payload);
   };
 
   return (
@@ -147,21 +131,11 @@ const DevelopmentFlowTab: React.FC = () => {
                         <td>{req.sistema}</td>
                         <td>{req.solicitante}</td>
                         <td>
-                          <span
-                            className={`${styles.badge} ${statusBadgeClass(req.statusDesenvolvimento || '')}`}
-                            style={{ cursor: 'pointer' }}
-                            onClick={(e) => {
-                              const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                              setStatusPicker({
-                                id: req.id,
-                                current: req.statusDesenvolvimento || '',
-                                top: rect.bottom,
-                                left: rect.left,
-                              });
-                            }}
-                          >
-                            {req.statusDesenvolvimento || '-'}
-                          </span>
+                          <CustomSelect
+                            value={req.statusDesenvolvimento || ''}
+                            onChange={(val) => handleStatusChange(req.id, val as StatusDesenvolvimento)}
+                            options={statusOptions.map(opt => ({ value: opt, label: opt }))}
+                          />
                         </td>
                       </tr>
                     ))
@@ -171,55 +145,6 @@ const DevelopmentFlowTab: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {statusPicker && (
-        <>
-          <div
-            style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
-            onMouseDown={() => setStatusPicker(null)}
-          />
-          <div
-            style={{
-              position: 'fixed',
-              top: statusPicker.top,
-              left: statusPicker.left,
-              zIndex: 9999,
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--input-border)',
-              borderRadius: '8px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-              minWidth: '180px',
-              padding: '4px',
-            }}
-          >
-            {statusOptions.map(opt => (
-              <button
-                key={opt}
-                onMouseDown={() => handleStatusChange(statusPicker.id, opt)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  padding: '6px 10px',
-                  border: 'none',
-                  background: statusPicker.current === opt ? 'var(--bg-hover)' : 'transparent',
-                  color: 'var(--text-main)',
-                  cursor: 'pointer',
-                  borderRadius: '6px',
-                  fontSize: '0.8rem',
-                  textAlign: 'left',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-hover)')}
-                onMouseLeave={e => { if (statusPicker.current !== opt) e.currentTarget.style.background = 'transparent'; }}
-              >
-                <span className={`${styles.badge} ${statusBadgeClass(opt)}`}>{opt}</span>
-                {statusPicker.current === opt && <Check size={14} />}
-              </button>
-            ))}
-          </div>
-        </>
       )}
     </div>
   );
