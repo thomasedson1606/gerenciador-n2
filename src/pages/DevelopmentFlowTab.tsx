@@ -122,7 +122,7 @@ const DevelopmentFlowTab: React.FC = () => {
 
       {hasQueried && (
         <div className={styles.gridSection}>
-          <div className="card" style={{ padding: 0, overflow: 'clip' }}>
+          <div className="card" style={{ padding: 0 }}>
             <div className={styles.tableResponsive}>
               <table className={styles.table}>
                 <thead>
@@ -160,6 +160,7 @@ const DevelopmentFlowTab: React.FC = () => {
                             {activePopupId === req.id && (
                               <div
                                 ref={popupRef}
+                                onClick={e => e.stopPropagation()}
                                 style={{
                                   position: 'absolute',
                                   top: '100%',
@@ -176,7 +177,7 @@ const DevelopmentFlowTab: React.FC = () => {
                                 {statusOptions.map(opt => (
                                   <button
                                     key={opt}
-                                    onClick={() => handleStatusChange(req.id, opt)}
+                                    onClick={(e) => { e.stopPropagation(); handleStatusChange(req.id, opt); }}
                                     style={{
                                       display: 'flex',
                                       alignItems: 'center',
