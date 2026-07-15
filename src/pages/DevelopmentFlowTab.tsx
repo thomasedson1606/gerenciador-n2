@@ -155,7 +155,7 @@ const DevelopmentFlowTab: React.FC = () => {
                               setStatusPicker({
                                 id: req.id,
                                 current: req.statusDesenvolvimento || '',
-                                top: rect.bottom + 4,
+                                top: rect.bottom,
                                 left: rect.left,
                               });
                             }}
