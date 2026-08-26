@@ -35,9 +35,9 @@ const CompletedRequestsTab: React.FC = () => {
               value={filterSituacao}
               onChange={setFilterSituacao}
               options={[
-                { value: '', label: 'TODAS' },
-                { value: 'FINALIZADA', label: 'FINALIZADA' },
-                { value: 'REJEITADA', label: 'REJEITADA' }
+                { value: 'TODAS', label: 'TODAS' },
+                { value: 'CORRIGIDA', label: 'CORRIGIDA' },
+                { value: 'FINALIZADA', label: 'FINALIZADA' }
               ]}
             />
           </div>
