@@ -52,7 +52,7 @@ const DevelopmentConclusionTab: React.FC = () => {
           changeLog: form.changeLog,
           sistemaAtualizado: form.sistemaAtualizado === 'SIM',
           situacao: form.sistemaAtualizado === 'SIM' ? 'FINALIZADA' : req.situacao,
-          statusDesenvolvimento: 'CORRIGIDA'
+          statusDesenvolvimento: form.sistemaAtualizado === 'SIM' ? 'FINALIZADA' : 'CORRIGIDA'
         });
         alert('Conclusão salva com sucesso!');
       } else if (req.statusDesenvolvimento === 'REJEITADA') {
